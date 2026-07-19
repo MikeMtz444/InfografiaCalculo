@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizarrón de Cálculo - Infografía Interactiva</title>
+    <!-- Tailwind CSS for structural grid layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for classroom icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for pristine math typography -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f2413;
+        }
+
+        /* Chalkboard texture background */
+        .chalkboard-bg {
+            background-color: #14301a;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
+                radial-gradient(rgba(255, 255, 255, 0.02) 2px, transparent 0);
+            background-size: 24px 24px, 40px 40px;
+            background-position: 0 0, 12px 12px;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Chalkboard panels */
+        .board-panel {
+            background-color: rgba(26, 58, 33, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Active buttons styling to look like a thick chalk outline */
+        .active-chalk {
+            border: 2px dashed rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Chalk handwriting glow effect */
+        .chalk-text {
+            color: #f8fafc;
+            text-shadow: 0 0 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .chalk-yellow {
+            color: #fef08a;
+            text-shadow: 0 0 1px rgba(254, 240, 138, 0.4);
+        }
+
+        .chalk-green {
+            color: #86efac;
+            text-shadow: 0 0 1px rgba(134, 239, 172, 0.4);
+        }
+
+        /* Custom range sliders styled to fit the chalk tray style */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            height: 6px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #14301a;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="chalkboard-bg text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Chalkboard wooden-like Header Frame -->
+    <header class="border-b-4 border-amber-900/60 bg-[#0d2112] py-4 shadow-xl">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 text-emerald-300 p-2 rounded-xl border border-white/20">
+                    <i class="fa-solid fa-chalkboard text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white chalk-text">Pizarrón de Cálculo</h1>
+                    <p class="text-xs text-slate-300">Infografía Didáctica de Integración</p>
+                </div>
+            </div>
+            <span class="text-[10px] uppercase tracking-widest bg-emerald-950/80 text-emerald-200 px-3.5 py-1.5 rounded-full border border-emerald-800 font-mono">
+                <i class="fa-solid fa-pen-nib mr-1"></i> Tiza / Gis Virtual Activo
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow flex flex-col justify-center gap-6">
+        
+        <!-- Interactive Concept Selector (Chalkboard style boxes) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <!-- BUTTON 1: Sumas de Riemann -->
+            <button onclick="switchConcept('riemann')" id="btn-riemann" class="group flex items-center space-x-3 p-3.5 rounded-2xl border-2 border-white/10 bg-[#163a1f]/80 hover:bg-[#1a4425] hover:border-white/30 transition-all text-left focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white border border-white/10 group-hover:bg-white/10 transition-colors shrink-0">
+                    <i class="fa-solid fa-chart-simple text-sm"></i>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-300 font-bold uppercase tracking-wider">Módulo 1</span>
+                    <h3 class="text-xs font-bold text-white leading-tight chalk-text">Sumas de Riemann</h3>
+                </div>
+            </button>
+
+            <!-- BUTTON 2: Concepto de Integral -->
+            <button onclick="switchConcept('definite')" id="btn-definite" class="group flex items-center space-x-3 p-3.5 rounded-2xl border-2 border-white/10 bg-[#163a1f]/80 hover:bg-[#1a4425] hover:border-white/30 transition-all text-left focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-300 border border-white/10 group-hover:bg-white/10 transition-colors shrink-0">
+                    <i class="fa-solid fa-shapes text-sm"></i>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-300 font-bold uppercase tracking-wider">Módulo 2</span>
+                    <h3 class="text-xs font-bold text-slate-200 leading-tight chalk-text">Integral Definida</h3>
+                </div>
+            </button>
+
+            <!-- BUTTON 3: Propiedades -->
+            <button onclick="switchConcept('properties')" id="btn-properties" class="group flex items-center space-x-3 p-3.5 rounded-2xl border-2 border-white/10 bg-[#163a1f]/80 hover:bg-[#1a4425] hover:border-white/30 transition-all text-left focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-300 border border-white/10 group-hover:bg-white/10 transition-colors shrink-0">
+                    <i class="fa-solid fa-arrows-split-up-and-left text-sm"></i>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-300 font-bold uppercase tracking-wider">Módulo 3</span>
+                    <h3 class="text-xs font-bold text-slate-200 leading-tight chalk-text">Propiedades</h3>
+                </div>
+            </button>
+
+            <!-- BUTTON 4: Teorema Fundamental -->
+            <button onclick="switchConcept('ftc')" id="btn-ftc" class="group flex items-center space-x-3 p-3.5 rounded-2xl border-2 border-white/10 bg-[#163a1f]/80 hover:bg-[#1a4425] hover:border-white/30 transition-all text-left focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-300 border border-white/10 group-hover:bg-white/10 transition-colors shrink-0">
+                    <i class="fa-solid fa-bridge-lock text-sm"></i>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-slate-300 font-bold uppercase tracking-wider">Módulo 4</span>
+                    <h3 class="text-xs font-bold text-slate-200 leading-tight chalk-text">Teor. Fundamental</h3>
+                </div>
+            </button>
+
+        </div>
+
+        <!-- Central Interactive Chalkboard Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Left Side: Interactive Graphic Canvas (Green blackboard preview) -->
+            <div id="blackboard-frame" class="lg:col-span-7 board-panel rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
+                
+                <!-- Graphic Canvas Metadata / Chalk Writing Badge -->
+                <div class="absolute top-6 left-6 z-10 bg-[#14301a] px-3.5 py-1.5 rounded-xl border-2 border-white/20 shadow-xl flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+                    <span id="graphic-metadata" class="text-xs font-mono text-white chalk-text font-bold">Gráfico de Tiza</span>
+                </div>
+
+                <!-- Central Interactive Canvas -->
+                <div class="w-full flex items-center justify-center py-4">
+                    <canvas id="infographic-canvas" class="w-full h-80 max-h-80 block rounded-2xl bg-[#14301a] cursor-pointer"></canvas>
+                </div>
+
+                <!-- Sliders Container -->
+                <div id="diagram-slider-controls" class="bg-[#102715] border-2 border-white/10 p-4 rounded-2xl space-y-3">
+                    <!-- Sliders injected here dynamically -->
+                </div>
+
+            </div>
+
+            <!-- Right Side: Chalk Written Lesson Card -->
+            <div class="lg:col-span-5 board-panel rounded-3xl p-6 flex flex-col justify-between">
+                
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <span id="concept-badge" class="px-3 py-1 text-[10px] font-bold tracking-widest uppercase bg-white/10 text-white border border-white/20 rounded-lg">
+                            Módulo 1
+                        </span>
+                        <span class="text-slate-300 text-xs">• Notas del Profesor</span>
+                    </div>
+
+                    <h2 id="concept-title" class="text-2xl font-black text-white chalk-text border-b-2 border-dashed border-white/20 pb-2">
+                        Sumas de Riemann
+                    </h2>
+
+                    <div id="concept-description" class="text-sm text-slate-200 space-y-4 leading-relaxed font-serif">
+                        <!-- LaTeX and explanations rendered here -->
+                    </div>
+                </div>
+
+                <!-- Bottom Blackboard Instruction -->
+                <div class="mt-6 pt-4 border-t-2 border-dashed border-white/10 flex items-center space-x-3 text-slate-300 text-xs">
+                    <i class="fa-solid fa-hand-pointer text-white animate-bounce"></i>
+                    <span>Modifica los controles tiza en el panel inferior del pizarrón.</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1c10] border-t-4 border-amber-900/60 py-4 text-center text-xs text-slate-400">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center space-x-2 text-white chalk-text">
+                <i class="fa-solid fa-graduation-cap text-white"></i>
+                <span class="font-bold">Portal del Cálculo</span>
+            </div>
+            <p>&copy; 2026. Recurso Didáctico para el Estudio del Cálculo Infinitesimal.</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic Execution -->
+    <script>
+        // Content definitions matching the chalkboard aesthetic (white/yellow/green chalk text and styles)
+        const CONCEPTS = {
+            riemann: {
+                id: 'riemann',
+                title: 'Sumas de Riemann',
+                badge: 'Módulo 1',
+                themeColor: '#ffffff', // White chalk
+                btnId: 'btn-riemann',
+                description: `
+                    <p>Las <strong>Sumas de Riemann</strong> son la aproximación elemental al área bajo una curva utilizando rectángulos verticales.</p>
+                    <p>Dividimos el intervalo $[a, b]$ en $n$ subintervalos de ancho constante $\\Delta x = \\frac{b-a}{n}$. Escogemos la altura según la aproximación (izquierda, punto medio o derecha):</p>
+                    <div class="bg-[#102715] p-3 rounded-xl border border-white/25 font-mono text-center my-3 text-white chalk-text">
+                        $$S_n = \\sum_{i=1}^n f(x_i^*) \\Delta x$$
+                    </div>
+                    <p>En el pizarrón, nota que al subir el número de rectángulos ($n$), la aproximación rayada en tiza se ajusta de forma perfecta a la curva real.</p>
+                `,
+                controls: `
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Número de rectángulos (<i>n</i>):</label>
+                            <span id="control-display-n" class="text-xs font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">10</span>
+                        </div>
+                        <input type="range" id="slider-n" min="4" max="64" step="1" value="10" class="w-full accent-white cursor-pointer">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <button onclick="setRiemannPoint('left', this)" class="riemann-pt-btn py-1 px-2 text-[11px] font-bold rounded-lg border-2 border-white/30 bg-[#163a1f] text-white transition">Tiza Izq.</button>
+                        <button onclick="setRiemannPoint('mid', this)" class="riemann-pt-btn py-1 px-2 text-[11px] font-bold rounded-lg border border-white/10 hover:border-white/30 text-slate-300 transition">Pto. Medio</button>
+                        <button onclick="setRiemannPoint('right', this)" class="riemann-pt-btn py-1 px-2 text-[11px] font-bold rounded-lg border border-white/10 hover:border-white/30 text-slate-300 transition">Tiza Der.</button>
+                    </div>
+                `
+            },
+            definite: {
+                id: 'definite',
+                title: 'Concepto de Integral Definida',
+                badge: 'Módulo 2',
+                themeColor: '#fef08a', // Yellow chalk
+                btnId: 'btn-definite',
+                description: `
+                    <p>La <strong>Integral Definida</strong> representa el límite formal de las Sumas de Riemann cuando el ancho de los rectángulos se hace infinitesimalmente pequeño.</p>
+                    <div class="bg-[#102715] p-3 rounded-xl border border-white/25 font-mono text-center my-3 text-yellow-200 chalk-yellow">
+                        $$\\int_a^b f(x) \\, dx = \\lim_{n \\to \\infty} \\sum_{i=1}^n f(x_i^*) \\Delta x$$
+                    </div>
+                    <p>Físicamente representa el <strong>área neta signada</strong> entre la gráfica de la función y el eje horizontal. La región trazada en amarillo (positiva) suma valor, mientras que la trazada en blanco-rosa (negativa) resta.</p>
+                    <p>Usa los gises deslizadores abajo para mover los límites de integración $a$ y $b$ sobre el pizarrón.</p>
+                `,
+                controls: `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Límite <i>a</i>:</label>
+                                <span id="control-display-a" class="text-xs font-mono font-bold text-yellow-200 bg-yellow-200/10 px-2 py-0.5 rounded border border-yellow-200/20">-2.0</span>
+                            </div>
+                            <input type="range" id="slider-a" min="-4" max="0" step="0.1" value="-2.0" class="w-full accent-yellow-300 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Límite <i>b</i>:</label>
+                                <span id="control-display-b" class="text-xs font-mono font-bold text-yellow-200 bg-yellow-200/10 px-2 py-0.5 rounded border border-yellow-200/20">2.0</span>
+                            </div>
+                            <input type="range" id="slider-b" min="0" max="4" step="0.1" value="2.0" class="w-full accent-yellow-300 cursor-pointer">
+                        </div>
+                    </div>
+                `
+            },
+            properties: {
+                id: 'properties',
+                title: 'Propiedades de la Integral Definida',
+                badge: 'Módulo 3',
+                themeColor: '#86efac', // Green chalk
+                btnId: 'btn-properties',
+                description: `
+                    <p>Las integrales respetan propiedades lógicas fundamentales muy sencillas. Una de ellas es la <strong>Aditividad del Intervalo</strong>:</p>
+                    <div class="bg-[#102715] p-3 rounded-xl border border-white/25 font-mono text-center my-3 text-emerald-300 chalk-green">
+                        $$\\int_a^c f(x) \\, dx = \\int_a^b f(x) \\, dx + \\int_b^c f(x) \\, dx$$
+                    </div>
+                    <p>Puedes calcular la integral total dividiéndola en dos sub-secciones coloreadas de tiza. Esto resulta ideal para integrales que sufren transiciones bruscas o cambios de tramo.</p>
+                    <p>Selecciona la propiedad en los botones inferiores del pizarrón para simular la inversión o la aditividad de segmentos independientes.</p>
+                `,
+                controls: `
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Simular Propiedad en Pizarrón:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setPropertyType('additive', this)" class="prop-btn py-1.5 px-3 text-[11px] font-bold rounded-lg border-2 border-emerald-400 bg-emerald-900/40 text-emerald-200 transition">Aditividad de Intervalos</button>
+                            <button onclick="setPropertyType('invert', this)" class="prop-btn py-1.5 px-3 text-[11px] font-bold rounded-lg border border-white/10 hover:border-white/30 text-slate-300 transition">Inversión de Límites</button>
+                        </div>
+                    </div>
+                `
+            },
+            ftc: {
+                id: 'ftc',
+                title: 'Teorema Fundamental del Cálculo',
+                badge: 'Módulo 4',
+                themeColor: '#ffffff', // White chalk
+                btnId: 'btn-ftc',
+                description: `
+                    <p>El <strong>Teorema Fundamental del Cálculo</strong> une los conceptos opuestos de derivada (tasa instantánea) e integral (acumulación total).</p>
+                    <p>Si definimos la función $g(x)$ que acumula área en el pizarrón desde un valor fijo $a$ hasta un límite móvil $x$:</p>
+                    <div class="bg-[#102715] p-3 rounded-xl border border-white/25 font-mono text-center my-3 text-white chalk-text">
+                        $$g(x) = \\int_a^x f(t) \\, dt \\implies g'(x) = f(x)$$
+                    </div>
+                    <p>La derivada de esta función de área es simplemente la curva original evaluada en el extremo superior. Mueve el límite de tiza $x$ para observar cómo cambia el área acumulada de forma dinámica.</p>
+                `,
+                controls: `
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Límite Móvil de Acumulación (<i>x</i>):</label>
+                            <span id="control-display-x" class="text-xs font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">1.0</span>
+                        </div>
+                        <input type="range" id="slider-x" min="-2.5" max="3.0" step="0.1" value="1.0" class="w-full accent-white cursor-pointer">
+                    </div>
+                `
+            }
+        };
+
+        // Application State Variables
+        let currentConceptId = 'riemann';
+        let stateN = 10;
+        let stateRiemannPoint = 'left'; 
+        let stateA = -2.0;
+        let stateB = 2.0;
+        let statePropertyType = 'additive'; 
+        let stateX = 1.0;
+
+        // Mathematical functions
+        function f(x) {
+            return 0.1 * Math.pow(x, 3) - 0.2 * Math.pow(x, 2) - 0.8 * x + 1.2;
+        }
+
+        function F(x) {
+            return 0.025 * Math.pow(x, 4) - (0.2 / 3) * Math.pow(x, 3) - 0.4 * Math.pow(x, 2) + 1.2 * x;
+        }
+
+        // Canvas Setup
+        let canvas = null;
+        let ctx = null;
+
+        window.onload = function() {
+            canvas = document.getElementById('infographic-canvas');
+            ctx = canvas.getContext('2d');
+            
+            switchConcept('riemann');
+            setupResponsiveResize();
+        };
+
+        function setupResponsiveResize() {
+            function resize() {
+                const rect = canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = 320 * dpr;
+                ctx.scale(dpr, dpr);
+                drawDiagram();
+            }
+            window.addEventListener('resize', resize);
+            resize();
+        }
+
+        function renderMath() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.getElementById('concept-description'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function switchConcept(conceptId) {
+            currentConceptId = conceptId;
+            const concept = CONCEPTS[conceptId];
+
+            const buttons = ['riemann', 'definite', 'properties', 'ftc'];
+            buttons.forEach(btnKey => {
+                const btn = document.getElementById(`btn-${btnKey}`);
+                if (btnKey === conceptId) {
+                    btn.className = "group flex items-center space-x-3 p-3.5 rounded-2xl border-2 bg-[#204727] active-chalk text-left focus:outline-none";
+                    const iconBox = btn.querySelector('div');
+                    iconBox.style.color = '#ffffff';
+                    iconBox.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                } else {
+                    btn.className = "group flex items-center space-x-3 p-3.5 rounded-2xl border-2 border-white/10 bg-[#163a1f]/80 hover:bg-[#1a4425] hover:border-white/30 transition-all text-left focus:outline-none";
+                    const iconBox = btn.querySelector('div');
+                    iconBox.style.color = '';
+                    iconBox.style.borderColor = '';
+                }
+            });
+
+            // Update explanation block
+            document.getElementById('concept-badge').innerText = concept.badge;
+            document.getElementById('concept-title').innerText = concept.title;
+            document.getElementById('concept-description').innerHTML = concept.description;
+            document.getElementById('diagram-slider-controls').innerHTML = concept.controls;
+
+            // Highlight blackboard container frame with a subtle soft chalk tray glow
+            const container = document.getElementById('blackboard-frame');
+            container.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+            container.style.boxShadow = `0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px ${concept.themeColor}1a`;
+
+            setupSliders(conceptId);
+            renderMath();
+            drawDiagram();
+        }
+
+        function setupSliders(conceptId) {
+            if (conceptId === 'riemann') {
+                const sliderN = document.getElementById('slider-n');
+                if (sliderN) {
+                    sliderN.value = stateN;
+                    document.getElementById('control-display-n').innerText = stateN;
+                    sliderN.addEventListener('input', (e) => {
+                        stateN = parseInt(e.target.value);
+                        document.getElementById('control-display-n').innerText = stateN;
+                        drawDiagram();
+                    });
+                }
+            } else if (conceptId === 'definite') {
+                const sliderA = document.getElementById('slider-a');
+                const sliderB = document.getElementById('slider-b');
+                if (sliderA && sliderB) {
+                    sliderA.value = stateA;
+                    sliderB.value = stateB;
+                    document.getElementById('control-display-a').innerText = stateA.toFixed(1);
+                    document.getElementById('control-display-b').innerText = stateB.toFixed(1);
+
+                    sliderA.addEventListener('input', (e) => {
+                        stateA = parseFloat(e.target.value);
+                        document.getElementById('control-display-a').innerText = stateA.toFixed(1);
+                        drawDiagram();
+                    });
+                    sliderB.addEventListener('input', (e) => {
+                        stateB = parseFloat(e.target.value);
+                        document.getElementById('control-display-b').innerText = stateB.toFixed(1);
+                        drawDiagram();
+                    });
+                }
+            } else if (conceptId === 'ftc') {
+                const sliderX = document.getElementById('slider-x');
+                if (sliderX) {
+                    sliderX.value = stateX;
+                    document.getElementById('control-display-x').innerText = stateX.toFixed(1);
+                    sliderX.addEventListener('input', (e) => {
+                        stateX = parseFloat(e.target.value);
+                        document.getElementById('control-display-x').innerText = stateX.toFixed(1);
+                        drawDiagram();
+                    });
+                }
+            }
+        }
+
+        function setRiemannPoint(type, elem) {
+            stateRiemannPoint = type;
+            document.querySelectorAll('.riemann-pt-btn').forEach(btn => {
+                btn.className = "riemann-pt-btn py-1 px-2 text-[11px] font-bold rounded-lg border border-white/10 hover:border-white/30 text-slate-300 transition";
+            });
+            elem.className = "riemann-pt-btn py-1 px-2 text-[11px] font-bold rounded-lg border-2 border-white/40 bg-[#204727] text-white transition";
+            drawDiagram();
+        }
+
+        function setPropertyType(type, elem) {
+            statePropertyType = type;
+            document.querySelectorAll('.prop-btn').forEach(btn => {
+                btn.className = "prop-btn py-1.5 px-3 text-[11px] font-bold rounded-lg border border-white/10 hover:border-white/30 text-slate-300 transition";
+            });
+            elem.className = "prop-btn py-1.5 px-3 text-[11px] font-bold rounded-lg border-2 border-emerald-400 bg-emerald-900/40 text-emerald-200 transition";
+            drawDiagram();
+        }
+
+        // Render function simulating chalk elements
+        function drawDiagram() {
+            if (!ctx || !canvas) return;
+
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, width, height);
+
+            // Set chalkboard dark green backdrop
+            ctx.fillStyle = '#14301a';
+            ctx.fillRect(0, 0, width, height);
+
+            // Limits mapping
+            const minX = -4.5;
+            const maxX = 4.5;
+            const minY = -2.5;
+            const maxY = 3.5;
+
+            function toX(mathX) {
+                return ((mathX - minX) / (maxX - minX)) * width;
+            }
+            function toY(mathY) {
+                return height - (((mathY - minY) / (maxY - minY)) * height);
+            }
+
+            // Draw thin chalk grid lines (highly transparent)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let x = Math.ceil(minX); x < maxX; x++) {
+                ctx.beginPath();
+                ctx.moveTo(toX(x), 0);
+                ctx.lineTo(toX(x), height);
+                ctx.stroke();
+            }
+            for (let y = Math.ceil(minY); y < maxY; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, toY(y));
+                ctx.lineTo(width, toY(y));
+                ctx.stroke();
+            }
+
+            // Central Cartesian coordinates axes (drawn as solid chalk outline)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, toY(0));
+            ctx.lineTo(width, toY(0));
+            ctx.moveTo(toX(0), 0);
+            ctx.lineTo(toX(0), height);
+            ctx.stroke();
+
+            // Chalk axis designations
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText('x', width - 15, toY(0) - 8);
+            ctx.fillText('y', toX(0) + 10, 15);
+
+            // Execute conditional blackboard rendering
+            if (currentConceptId === 'riemann') {
+                drawRiemannGraphic(toX, toY);
+            } else if (currentConceptId === 'definite') {
+                drawDefiniteGraphic(toX, toY);
+            } else if (currentConceptId === 'properties') {
+                drawPropertiesGraphic(toX, toY);
+            } else if (currentConceptId === 'ftc') {
+                drawFTCGraphic(toX, toY);
+            }
+        }
+
+        // Riemann visualization (tessellated chalkboard styling)
+        function drawRiemannGraphic(toX, toY) {
+            const a = -3.0;
+            const b = 3.0;
+            const n = stateN;
+            const dx = (b - a) / n;
+            let sum = 0;
+
+            for (let i = 0; i < n; i++) {
+                const left = a + i * dx;
+                const right = left + dx;
+                
+                let sampleX = left;
+                if (stateRiemannPoint === 'mid') {
+                    sampleX = (left + right) / 2;
+                } else if (stateRiemannPoint === 'right') {
+                    sampleX = right;
+                }
+
+                const heightVal = f(sampleX);
+                sum += heightVal * dx;
+
+                const isPos = heightVal >= 0;
+                // Draw rectangles with classic textured chalk style
+                ctx.fillStyle = isPos ? 'rgba(255, 255, 255, 0.15)' : 'rgba(251, 113, 133, 0.15)';
+                ctx.strokeStyle = isPos ? 'rgba(255, 255, 255, 0.6)' : 'rgba(251, 113, 133, 0.6)';
+                ctx.lineWidth = 1.5;
+
+                const rx = toX(left);
+                const rw = toX(right) - toX(left);
+                const ry = isPos ? toY(heightVal) : toY(0);
+                const rh = Math.abs(toY(0) - toY(heightVal));
+
+                ctx.fillRect(rx, ry, rw, rh);
+                ctx.strokeRect(rx, ry, rw, rh);
+
+                // Sample dot represent on curve
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(toX(sampleX), toY(heightVal), 3.5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Draw primary function curve in thick white chalk
+            drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+            const realVal = F(b) - F(a);
+            document.getElementById('graphic-metadata').innerHTML = `
+                S<sub>${n}</sub> = <span class="text-white font-bold">${sum.toFixed(3)}</span> | 
+                Área Real = <span class="text-slate-300">${realVal.toFixed(3)}</span>
+            `;
+        }
+
+        // Definite integration (Yellow chalk styling)
+        function drawDefiniteGraphic(toX, toY) {
+            const a = stateA;
+            const b = stateB;
+
+            // Paint area under curve using a chalkboard-textured fill
+            const steps = 180;
+            const stepW = (b - a) / steps;
+            for (let i = 0; i < steps; i++) {
+                const x1 = a + i * stepW;
+                const x2 = x1 + stepW;
+                const y = f(x1);
+                const isPos = y >= 0;
+
+                ctx.fillStyle = isPos ? 'rgba(254, 240, 138, 0.25)' : 'rgba(251, 113, 133, 0.2)';
+                const sx1 = toX(x1);
+                const sx2 = toX(x2);
+                const syZero = toY(0);
+                const syVal = toY(y);
+
+                ctx.fillRect(sx1, isPos ? syVal : syZero, sx2 - sx1 + 0.6, Math.abs(syZero - syVal));
+            }
+
+            // Limit boundaries styled as dashed yellow chalk marks
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(toX(a), toY(-2.5));
+            ctx.lineTo(toX(a), toY(3.5));
+            ctx.moveTo(toX(b), toY(-2.5));
+            ctx.lineTo(toX(b), toY(3.5));
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Print text limits as chalk marks
+            ctx.fillStyle = '#fef08a';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText(`a = ${a.toFixed(1)}`, toX(a) - 18, toY(0) + 18);
+            ctx.fillText(`b = ${b.toFixed(1)}`, toX(b) - 18, toY(0) + 18);
+
+            // Re-render function curve
+            drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+            const area = F(b) - F(a);
+            document.getElementById('graphic-metadata').innerHTML = `
+                &int;<sub>${a.toFixed(1)}</sub><sup>${b.toFixed(1)}</sup> f(x) dx = <span class="text-yellow-200 font-bold">${area.toFixed(3)}</span>
+            `;
+        }
+
+        // Properties graphic representation (green chalk highlighting)
+        function drawPropertiesGraphic(toX, toY) {
+            const a = -2.5;
+            const b = 0.5;
+            const c = 2.5;
+
+            if (statePropertyType === 'additive') {
+                // Interval 1 (Green chalk)
+                drawRegion(a, b, 'rgba(134, 239, 172, 0.25)', toX, toY);
+                // Interval 2 (Yellow chalk)
+                drawRegion(b, c, 'rgba(254, 240, 138, 0.25)', toX, toY);
+
+                // Chalk lines
+                drawVerticalDashed(a, toX, toY, 'rgba(134, 239, 172, 0.7)');
+                drawVerticalDashed(b, toX, toY, 'rgba(254, 240, 138, 0.7)');
+                drawVerticalDashed(c, toX, toY, 'rgba(255, 255, 255, 0.7)');
+
+                drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+                const area1 = F(b) - F(a);
+                const area2 = F(c) - F(b);
+                const total = F(c) - F(a);
+
+                document.getElementById('graphic-metadata').innerHTML = `
+                    &int;<sub>a</sub><sup>b</sup> (${area1.toFixed(1)}) + &int;<sub>b</sub><sup>c</sup> (${area2.toFixed(1)}) = &int;<sub>a</sub><sup>c</sup> (${total.toFixed(1)})
+                `;
+            } else {
+                // Inversion demonstration
+                const start = -1.5;
+                const end = 1.5;
+
+                drawRegion(start, end, 'rgba(251, 113, 133, 0.25)', toX, toY);
+                drawVerticalDashed(start, toX, toY, 'rgba(251, 113, 133, 0.7)');
+                drawVerticalDashed(end, toX, toY, 'rgba(251, 113, 133, 0.7)');
+
+                drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+                const normal = F(end) - F(start);
+                const inverted = F(start) - F(end);
+
+                document.getElementById('graphic-metadata').innerHTML = `
+                    &int;<sub>${end}</sub><sup>${start}</sup> f = - &int;<sub>${start}</sub><sup>${end}</sup> f = <span class="text-rose-300 font-bold">${inverted.toFixed(3)}</span>
+                `;
+            }
+        }
+
+        // Fundamental Theorem (chalk tracking simulation)
+        function drawFTCGraphic(toX, toY) {
+            const a = -2.5;
+            const x = stateX;
+
+            // Highlight dynamic accumulation region in green/yellow chalk
+            drawRegion(a, x, 'rgba(134, 239, 172, 0.25)', toX, toY);
+
+            // Vertical tiza limit marker at variable limit x
+            ctx.strokeStyle = '#86efac';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(toX(x), toY(0));
+            ctx.lineTo(toX(x), toY(f(x)));
+            ctx.stroke();
+
+            // Tangent circular point
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(toX(x), toY(f(x)), 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            drawVerticalDashed(a, toX, toY, 'rgba(255, 255, 255, 0.5)');
+
+            // Trace accumulation trajectory g(x) over diagram as dynamic dashed chalk line
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 4]);
+            ctx.beginPath();
+            let first = true;
+            for (let t = -3.5; t <= 3.5; t += 0.1) {
+                const areaG = F(t) - F(a);
+                if (first) {
+                    ctx.moveTo(toX(t), toY(areaG));
+                    first = false;
+                } else {
+                    ctx.lineTo(toX(t), toY(areaG));
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Master curve trace
+            drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+            const accumVal = F(x) - F(a);
+            const rate = f(x);
+
+            document.getElementById('graphic-metadata').innerHTML = `
+                Área g(<i>x</i>) = <span class="text-yellow-200 font-bold">${accumVal.toFixed(2)}</span> | 
+                g'(<i>x</i>) = <span class="text-white font-bold">${rate.toFixed(2)}</span>
+            `;
+        }
+
+        // Definite integration (Yellow chalk styling)
+        function drawDefiniteGraphic(toX, toY) {
+            const a = stateA;
+            const b = stateB;
+
+            // Paint area under curve using a chalkboard-textured fill
+            const steps = 180;
+            const stepW = (b - a) / steps;
+            for (let i = 0; i < steps; i++) {
+                const x1 = a + i * stepW;
+                const x2 = x1 + stepW;
+                const y = f(x1);
+                const isPos = y >= 0;
+
+                ctx.fillStyle = isPos ? 'rgba(254, 240, 138, 0.25)' : 'rgba(251, 113, 133, 0.2)';
+                const sx1 = toX(x1);
+                const sx2 = toX(x2);
+                const syZero = toY(0);
+                const syVal = toY(y);
+
+                ctx.fillRect(sx1, isPos ? syVal : syZero, sx2 - sx1 + 0.6, Math.abs(syZero - syVal));
+            }
+
+            // Limit boundaries styled as dashed yellow chalk marks
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(toX(a), toY(-2.5));
+            ctx.lineTo(toX(a), toY(3.5));
+            ctx.moveTo(toX(b), toY(-2.5));
+            ctx.lineTo(toX(b), toY(3.5));
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Print text limits as chalk marks
+            ctx.fillStyle = '#fef08a';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText(`a = ${a.toFixed(1)}`, toX(a) - 18, toY(0) + 18);
+            ctx.fillText(`b = ${b.toFixed(1)}`, toX(b) - 18, toY(0) + 18);
+
+            // Re-render function curve
+            drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+            const area = F(b) - F(a);
+            document.getElementById('graphic-metadata').innerHTML = `
+                &int;_{${a.toFixed(1)}}^{${b.toFixed(1)}} f(x) dx = <span class="text-yellow-200 font-bold">${area.toFixed(3)}</span>
+            `;
+        }
+
+        // Properties graphic representation (green chalk highlighting)
+        function drawPropertiesGraphic(toX, toY) {
+            const a = -2.5;
+            const b = 0.5;
+            const c = 2.5;
+
+            if (statePropertyType === 'additive') {
+                // Interval 1 (Green chalk)
+                drawRegion(a, b, 'rgba(134, 239, 172, 0.25)', toX, toY);
+                // Interval 2 (Yellow chalk)
+                drawRegion(b, c, 'rgba(254, 240, 138, 0.25)', toX, toY);
+
+                // Chalk lines
+                drawVerticalDashed(a, toX, toY, 'rgba(134, 239, 172, 0.7)');
+                drawVerticalDashed(b, toX, toY, 'rgba(254, 240, 138, 0.7)');
+                drawVerticalDashed(c, toX, toY, 'rgba(255, 255, 255, 0.7)');
+
+                drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+                const area1 = F(b) - F(a);
+                const area2 = F(c) - F(b);
+                const total = F(c) - F(a);
+
+                document.getElementById('graphic-metadata').innerHTML = `
+                    &int;_{a}^{b} (${area1.toFixed(1)}) + &int;_{b}^{c} (${area2.toFixed(1)}) = &int;_{a}^{c} (${total.toFixed(1)})
+                `;
+            } else {
+                // Inversion demonstration
+                const start = -1.5;
+                const end = 1.5;
+
+                drawRegion(start, end, 'rgba(251, 113, 133, 0.25)', toX, toY);
+                drawVerticalDashed(start, toX, toY, 'rgba(251, 113, 133, 0.7)');
+                drawVerticalDashed(end, toX, toY, 'rgba(251, 113, 133, 0.7)');
+
+                drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+                const normal = F(end) - F(start);
+                const inverted = F(start) - F(end);
+
+                document.getElementById('graphic-metadata').innerHTML = `
+                    &int;_{1.5}^{-1.5} f = - &int;_{-1.5}^{1.5} f = <span class="text-rose-300 font-bold">${inverted.toFixed(3)}</span>
+                `;
+            }
+        }
+
+        // Fundamental Theorem (chalk tracking simulation)
+        function drawFTCGraphic(toX, toY) {
+            const a = -2.5;
+            const x = stateX;
+
+            // Highlight dynamic accumulation region in green/yellow chalk
+            drawRegion(a, x, 'rgba(134, 239, 172, 0.25)', toX, toY);
+
+            // Vertical tiza limit marker at variable limit x
+            ctx.strokeStyle = '#86efac';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(toX(x), toY(0));
+            ctx.lineTo(toX(x), toY(f(x)));
+            ctx.stroke();
+
+            // Tangent circular point
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(toX(x), toY(f(x)), 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            drawVerticalDashed(a, toX, toY, 'rgba(255, 255, 255, 0.5)');
+
+            // Trace accumulation trajectory g(x) over diagram as dynamic dashed chalk line
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 4]);
+            ctx.beginPath();
+            let first = true;
+            for (let t = -3.5; t <= 3.5; t += 0.1) {
+                const areaG = F(t) - F(a);
+                if (first) {
+                    ctx.moveTo(toX(t), toY(areaG));
+                    first = false;
+                } else {
+                    ctx.lineTo(toX(t), toY(areaG));
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Master curve trace
+            drawCurve(toX, toY, 'rgba(255, 255, 255, 0.9)', 3);
+
+            const accumVal = F(x) - F(a);
+            const rate = f(x);
+
+            document.getElementById('graphic-metadata').innerHTML = `
+                Área g(${x.toFixed(1)}) = <span class="text-yellow-200 font-bold">${accumVal.toFixed(2)}</span> | 
+                g'(${x.toFixed(1)}) = <span class="text-white font-bold">${rate.toFixed(2)}</span>
+            `;
+        }
+
+        // Shared Chalk Drawing Helpers
+        function drawCurve(toX, toY, color, thickness) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = thickness;
+            ctx.beginPath();
+            let first = true;
+            for (let x = -4.5; x <= 4.5; x += 0.05) {
+                const sx = toX(x);
+                const sy = toY(f(x));
+                if (first) {
+                    ctx.moveTo(sx, sy);
+                    first = false;
+                } else {
+                    ctx.lineTo(sx, sy);
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawRegion(start, end, fillStyle, toX, toY) {
+            ctx.fillStyle = fillStyle;
+            ctx.beginPath();
+            ctx.moveTo(toX(start), toY(0));
+            for (let x = start; x <= end; x += 0.05) {
+                ctx.lineTo(toX(x), toY(f(x)));
+            }
+            ctx.lineTo(toX(end), toY(0));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawVerticalDashed(x, toX, toY, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(toX(x), 0);
+            ctx.lineTo(toX(x), canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    </script>
+</body>
+</html>
